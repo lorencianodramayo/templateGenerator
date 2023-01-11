@@ -82,6 +82,8 @@ const App = () => {
         )}
       </Upload>
 
+      {console.log(artboards)}
+
       {!_.isEmpty(base?.file?.artboards) &&
         Object.keys(base?.file?.artboards).map((data) => (
           <div
@@ -92,8 +94,33 @@ const App = () => {
               border: "1px solid #000",
             }}
           >
-            {_.filter(artboards, (artboard) => artboard?.file?.children[0]?.id === data)[0]?.file?.children[0].artboard.children}
-            {`${base?.file?.artboards[data].name}`}
+            {_.filter(
+              artboards,
+              (artboard) => artboard?.file?.children[0]?.id === data
+            )[0]?.file?.children[0].artboard.children.map((arts) =>
+              arts?.type === "group" ? (
+                <div key={arts?.id} id={`${arts?.name}-wrapper`}></div>
+              ) : arts?.type === "shape" ? (
+                <div key={arts?.id}></div>
+              ) : (
+                <p
+                  key={arts?.id}
+                  style={{
+                    fontSize: `${arts?.style?.font?.size}px`,
+                    fontFamily: arts?.style?.font?.family,
+                    lineHeight: `${arts?.style?.textAttributes?.lineHeight}px`,
+                    top: `${arts?.meta?.ux?.localTransform?.ty}px`,
+                    left: `${arts?.meta?.ux?.localTransform?.tx}px`,
+                    width: `${arts?.text?.frame?.width}px`,
+                    height: `${arts?.text?.frame?.height}px`,
+                    position: 'relative'
+                  }}
+                  id={_.camelCase(arts?.name)}
+                >
+                  {arts?.text?.rawText}
+                </p>
+              )
+            )}
           </div>
         ))}
     </>
