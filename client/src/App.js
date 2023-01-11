@@ -85,44 +85,63 @@ const App = () => {
       {console.log(artboards)}
 
       {!_.isEmpty(base?.file?.artboards) &&
-        Object.keys(base?.file?.artboards).map((data) => (
-          <div
-            key={data}
-            style={{
-              width: `${base?.file?.artboards[data].width}px`,
-              height: `${base?.file?.artboards[data].height}px`,
-              border: "1px solid #000",
-            }}
-          >
-            {_.filter(
-              artboards,
-              (artboard) => artboard?.file?.children[0]?.id === data
-            )[0]?.file?.children[0].artboard.children.map((arts) =>
-              arts?.type === "group" ? (
-                <div key={arts?.id} id={`${arts?.name}-wrapper`}></div>
-              ) : arts?.type === "shape" ? (
-                <div key={arts?.id}></div>
-              ) : (
-                <p
-                  key={arts?.id}
-                  style={{
-                    fontSize: `${arts?.style?.font?.size}px`,
-                    fontFamily: arts?.style?.font?.family,
-                    lineHeight: `${arts?.style?.textAttributes?.lineHeight}px`,
-                    top: `${arts?.meta?.ux?.localTransform?.ty}px`,
-                    left: `${arts?.meta?.ux?.localTransform?.tx}px`,
-                    width: `${arts?.text?.frame?.width}px`,
-                    height: `${arts?.text?.frame?.height}px`,
-                    position: 'relative'
-                  }}
-                  id={_.camelCase(arts?.name)}
-                >
-                  {arts?.text?.rawText}
-                </p>
-              )
-            )}
-          </div>
-        ))}
+        Object.keys(base?.file?.artboards).map(
+          (data) =>
+            !base?.file?.artboards[data]?.name?.toLowerCase().split(' ').includes("fix") && (
+              <div
+                key={data}
+                style={{
+                  width: `${base?.file?.artboards[data].width}px`,
+                  height: `${base?.file?.artboards[data].height}px`,
+                  border: "1px solid #000",
+                  position: "relative",
+                }}
+              >
+                {_.filter(
+                  artboards,
+                  (artboard) => artboard?.file?.children[0]?.id === data
+                )[0]?.file?.children[0].artboard.children.map((arts) =>
+                  arts?.type === "group" ? (
+                    <div key={arts?.id} id={`${arts?.name}-wrapper-${data}`}>
+                      {arts?.group?.children?.map((grp) =>
+                        grp?.type === "text" ? (
+                          <p key={`${grp?.id}`} id={`${grp?.name}-${grp?.id}`}>
+                            {grp?.text?.rawText}
+                          </p>
+                        ) : (
+                          <div
+                            key={`${grp?.id}`}
+                            id={`${grp?.name}-${grp?.id}`}
+                          ></div>
+                        )
+                      )}
+                    </div>
+                  ) : arts?.type === "shape" ? (
+                    <div key={arts?.id}></div>
+                  ) : (
+                    <p
+                      key={arts?.id}
+                      style={{
+                        fontSize: `${arts?.style?.font?.size}px`,
+                        fontFamily: arts?.style?.font?.family,
+                        lineHeight: `${arts?.style?.textAttributes?.lineHeight}px`,
+                        textAlign: `${arts?.style?.textAttributes?.paragraphAlign}`,
+                        top: `${arts?.meta?.ux?.localTransform?.ty}px`,
+                        left: `${arts?.meta?.ux?.localTransform?.tx}px`,
+                        width: `${arts?.text?.frame?.width}px`,
+                        height: `${arts?.text?.frame?.height}px`,
+                        margin: 0,
+                        position: "absolute",
+                      }}
+                      id={`${_.camelCase(arts?.name)}-${data}`}
+                    >
+                      {arts?.text?.rawText}
+                    </p>
+                  )
+                )}
+              </div>
+            )
+        )}
     </>
   );
 };
